@@ -1,5 +1,6 @@
 #!/bin/bash
-# Author & Copyright holder: Rogentos Team, 2018
+# Author & Copyright holder: Rogentos Team, 2018-2019
+# LICENSE: GPL v2
 # This script recompiles simple packages which
 # are not installed on the system, and are present in $PKGDIR
 

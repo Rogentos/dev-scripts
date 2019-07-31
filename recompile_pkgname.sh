@@ -88,4 +88,4 @@ else
         cat /tmp/PKG_LIST_UNIQUE_NOREVS | sort -u >> /tmp/PKG_LIST_UNIQUE || exit 1
 fi
 
-epkg autobuildpkgonly --skip-update $( cat /tmp/PKG_LIST_UNIQUE ) --keep-going y --skip-first
+epkg autobuildpkgonly --skip-update $( cat /tmp/PKG_LIST_UNIQUE ) --keep-going y
