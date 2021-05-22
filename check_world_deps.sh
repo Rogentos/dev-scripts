@@ -1,13 +1,24 @@
 #!/bin/bash
 
-while read i ; do \
-        if [[ -n "$(qdepends -Q $i)" ]]; then \
-                echo '' ; echo 'checking '$i ;
-                if [[ -n "$(emerge -p --quiet --depclean $i)" ]]; then \
-                        echo $i' needs to stay in @world'
-                else
-                        echo $i' can be deselected'
-                        echo $i >> /tmp/deselect
-                fi
+set -x
+
+world_file='/var/lib/portage/world'
+deselect='/tmp/deselect'
+
+while read package ; do
+    printf "${package}: "
+    check=$(qdepends -Q ${package} 2>&1)
+    if [[ -n ${check} ]]; then
+        if [[ ${check} == *'no matches found'* ]]; then
+            printf "No matches found for your query\n"
+        else
+            emerge_check=$(emerge -p --quiet --depclean ${package} 2>&1)
+            if [[ -n ${emerge_check} ]]; then
+                printf "Needs to stay in @world\n"
+            else
+                printf "Can be deselected\n"
+                printf "${package}\n" >> ${deselect}
+            fi
         fi
-done < /var/lib/portage/world
+    fi
+done < ${world_file}
