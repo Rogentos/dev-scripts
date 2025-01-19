@@ -2,9 +2,18 @@
 
 # Check if an argument is provided
 if [ -z "$1" ]; then
-    echo "Usage: $0 <package>"
+    echo "Usage: $0 <package> [--auto]"
     exit 1
 fi
+
+# Check for the --auto argument, which dodges the asking prompt
+auto_mode=false
+for arg in "$@"; do
+    if [ "$arg" == "--auto" ]; then
+        auto_mode=true
+        break
+    fi
+done
 
 # Run equery g -UMAl on the provided argument
 equery_output=$(equery g -UMAl "$1")
@@ -18,7 +27,7 @@ echo $categories
 # Get the list of installed packages
 installed_packages=$(qlist -Iv)
 
-# Print the equery output, excluding lines with the given category/package name, and ensure unique results
+# Print the equery output, excluding lines with the given category/package-version-revision name, and ensure unique results
 dependencies=$(echo "$equery_output" | grep -v "$1" | awk '{$1=""; sub(/^[ \t]+/, ""); sub(/^[0-9]+\] /, ""); print}' | sort | uniq)
 
 # Create a temporary locked file
@@ -38,10 +47,14 @@ temp_file=$(mktemp)
 } 200>"$temp_file"
 
 # Output the path to the temporary locked file
-echo "Output of command written to $temp_file"s
+echo "Output of command written to $temp_file"
 
 # Emerge the exact packages in the temporary locked file
-emerge -va1 $(cat "$temp_file")
+if [ "$auto_mode" = true ]; then
+    emerge -v1 $(cat "$temp_file")
+else
+    emerge -va1 $(cat "$temp_file")
+fi
 
 # Remove the temporary locked file
 rm -f "$temp_file"
