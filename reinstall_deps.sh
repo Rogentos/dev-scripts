@@ -18,6 +18,14 @@ done
 # Run equery g -UMAl on the provided argument
 equery_output=$(equery g -UMAl "$1")
 
+# Check the exit status
+if [ $? -eq 0 ]; then
+    echo ""
+else
+    echo "Command failed with exit code $?"
+    exit 1
+fi
+
 # Extract categories from the argument
 categories=$(echo "$1" | grep -oE '\b[a-z]+-[a-z]+\b' | sort -u)
 
@@ -57,4 +65,3 @@ else
 fi
 
 # Remove the temporary locked file
-rm -f "$temp_file"
